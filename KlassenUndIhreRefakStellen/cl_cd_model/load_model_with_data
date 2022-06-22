@@ -1,0 +1,55 @@
+METHOD /ruif/if_model~load_model_with_data.
+    "ToDo SeSe 13.05.2022: NEW-Operatoren durch Dependency Injection ersetzen?
+    DATA alv_scheme_builder TYPE REF TO /drt/if_cd_alv_scheme_builder.
+    DATA cust_disp_alv_data_carrier TYPE REF TO /drt/if_cd_cust_alv_table_data.
+
+    FIELD-SYMBOLS: <selection_screen_selection> TYPE /drt/s_cd_selection_screen.
+    ASSIGN data->* TO <selection_screen_selection>.
+
+    model_data-selection_screen_selection = <selection_screen_selection>.
+
+    TRY.
+        "Basis: IPE-Engine wird aufgerufen -> Customizing ausgelesen -> bei allen gleich
+        create_sorted_procss_step_list( <selection_screen_selection> ).
+        
+        "BAIS-spezifisches Feature (wegen CashComponente). 
+        split_differentiation_criteria( ).
+
+      CATCH /ipe/cx_pp_factory INTO DATA(obj_cx_pp_factory).
+        obj_cx_pp_factory->supply_syst_with_msgpar( ).
+*     Nachrichtentyp "Abbruch" wird in "Fehler" umgesetzt, um das
+*     Verlassen der aktuellen Transaktion, i.d.R. SPRO zu vermeiden
+        IF sy-msgty EQ /ipe/cx_pp_factory=>co_msgty_abort.
+          sy-msgty = /ipe/cx_pp_factory=>co_msgty_error.
+        ENDIF.
+        MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDTRY.
+
+    IF model_data-tab_pp_cus_display IS INITIAL.
+      " Keine Prozessschritte dazu gefunden
+      MESSAGE e002(/drt/cd_messages).
+    ENDIF.
+    
+    "hier drin auch Aufrufe von Datebanktabellen, die nicht überall benötigt werden...siehe entsprechende Datei der Methode im Github.
+    read_model_data_frm_img_tables( <selection_screen_selection> ).
+    
+    "vermutlich universell
+    delete_not_needed_entries( ).    
+
+    "ALV-Scheme-Builder in eigenem File im Github analysiert -> Produkt-Flexibilität durch Decorator-Pattern realisieren!
+    me->model_data-cust_display_alv_scheme = NEW /drt/cl_cd_alv_scheme_builder( )->/drt/if_cd_alv_scheme_builder~build_alv_table_scheme( me->model_data ).
+    
+    cust_disp_alv_data_carrier = NEW /drt/cl_cd_cust_alv_table_data( me->model_data-cust_display_alv_scheme ).
+    
+    cust_disp_alv_data_carrier->create_alv_data(
+                                    selection_screen_selection = <selection_screen_selection>
+                                    model_data                 = model_data ).
+
+    cust_disp_alv_data_carrier->enrich_alv_data(
+                                    selection_screen_selection = <selection_screen_selection>
+                                    model_data                 = model_data ).
+                                    
+    model_data-tab_alv_data_to_display = cust_disp_alv_data_carrier->get_ref_alv_table_data( ).
+    
+  ENDMETHOD.
