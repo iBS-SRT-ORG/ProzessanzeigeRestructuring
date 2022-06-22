@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/DRT/CL_CD_FCAT_EXT_STRATEGY</CLSNAME>
+    <LANGU>D</LANGU>
+    <DESCRIPT>Strategiebaustein zur (dyn.) Erweiterung des Feldkatalogs</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_FCAT_EXT_STRATEGY</CLSNAME>
+     <CMPNAME>EXTEND_FCAT_DYNAMICALLY</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>fügt dynamisch Felder zur Fcat hinzu</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_FCAT_EXT_STRATEGY</CLSNAME>
+     <CMPNAME>EXTEND_FCAT_HARD_CODED</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>fügt nicht(!)-dynamisch, sondern hartgecodet Felder hinzu</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

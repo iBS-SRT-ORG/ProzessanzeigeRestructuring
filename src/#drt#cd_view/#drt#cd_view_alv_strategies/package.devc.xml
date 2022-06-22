@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DEVC>
-    <CTEXT>Enthält View-Komponenten der Prozessanzeige</CTEXT>
+    <CTEXT>Enhält Strategie-Bausteine zum Aufbau der Prozessanzeige-ALV</CTEXT>
    </DEVC>
   </asx:values>
  </asx:abap>
