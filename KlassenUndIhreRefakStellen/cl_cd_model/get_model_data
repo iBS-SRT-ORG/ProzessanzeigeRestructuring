@@ -15,10 +15,9 @@ METHOD /ruif/if_model~get_model_data.
 ENDMETHOD.
   
 (neu)
-METHOD /ruif/if_model~get_model_data.
-    CREATE DATA model_data TYPE (dynamisch_ausgelesene_produktspezfische_modeldatenhaushalts_struktur).
-    FIELD-SYMBOLS:<model_data> TYPE any.
-    ASSIGN model_data->* TO <model_data>.
-    <model_data> = me->model_data.
-    model_data = REF #( <model_data> ).
+METHOD /ruif/if_model~get_model_data.    
+    "die Anlage auf dem Heap, wie in der aktuellen Methode anfangs erfolgt, muss nun im jeweiligen Modeldatenhaushalt - in der Methode get_model_
+    "data implementiert werden.
+    
+    result = me->model_data->get_model_data( ).
 ENDMETHOD.  
