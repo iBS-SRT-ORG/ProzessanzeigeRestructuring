@@ -1,0 +1,26 @@
+aktuell:
+
+METHOD /drt/if_cd_cust_alv_table_data~create_alv_data.
+  write_source_tables_into_alv( model_data ).
+  transfer_pp_cus_disp_to_alv(
+        cust_display_alv_scheme    = me->cust_display_alv_table_scheme
+        selection_screen_selection = selection_screen_selection
+        model_data                 = model_data ).
+  i_have_no_clue_what_this_does( model_data-tab_differentiation_criteria ).
+  fill_remaining_diff_criteria( model_data-tab_differentiation_criteria ).
+ENDMETHOD.
+
+neu:
+
+METHOD /drt/if_cd_cust_alv_table_data~create_alv_data.
+  transfer_pp_cus_disp_to_alv(
+        cust_display_alv_scheme    = me->cust_display_alv_table_scheme
+        selection_screen_selection = selection_screen_selection
+        model_data                 = model_data ).
+ENDMETHOD.
+
+
+- lediglich der Transfer der ausgelesenen Grund-IPE-Einstellungen bleibt in der Standard-Prozessanzeige bestehen
+- sämtliches weitere, aktuell noch vorhandene Verhalten (write_source_tables_into_alv, i_have_no_clue_what_this_does, fill_remaining_diff_criteria) ist schon produkt-
+  spezifisch (in diesem Fall BAIS), muss also isoliert werden
+- beispielsweise erneut über Decorator-Pattern
