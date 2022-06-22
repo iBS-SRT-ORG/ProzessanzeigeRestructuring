@@ -6,7 +6,7 @@ neuer Prozessschritt-Tabelle - wegen Cash Component -, Dokumentations-Einstellun
 Welcher Modeldatenhaushalt-Implementierung dann in der Model-Klasse vorliegt wird dynamisch zur Laufzeit ausgelesen (muss in irgendeiner Form konfiguriert werden)
 
 
-Vorgehensweise (Änderungen an aktueller VersioN):
+Vorgehensweise zur Verallgemeinerung der Prozessanzeige in dieser Klasse:
 - am Anfang mittels Konfiguration das produktspezifische Modeldatenhaushalts-Objekt instanziieren (SimpleFactory oder AbstractFactory)
 - Selection-Screen-Auswahl über setter-Methode im Modeldatanhaushalt setzen.
 - Process-Step-List-Creator als Klasse modellieren -> Attribute: Selection-Screen-Auswahl (übergeben in Konstruktor) und eigentliche Process-Step-List, API mit Methode
