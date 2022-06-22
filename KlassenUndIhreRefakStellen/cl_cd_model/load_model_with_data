@@ -17,9 +17,10 @@ Vorgehensweise zur Verallgemeinerung der Prozessanzeige in dieser Klasse:
 - read_model_data_frm_img_tables eventuell komplett in Strategie-Objekt auslagern? Übergabeparameter das Model selbst. Interface des Data Accessors segregieren in 
   einen universellen Teil und einen produktspezifischen Teil (zB bei BAIS Auslesen der CashComponents)
 - prüfen, ob delete_not_needed_entries so universell für IPE-Derivat-Prozessanzeigen gilt oder BAIS-spezifisch.
+- für ALV-Scheme-Builder braucht es definitiv eine Factory -> muss richtig dekoriertes Objekt zurückgeben 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+aktuell:
 METHOD /ruif/if_model~load_model_with_data.
     "ToDo SeSe 13.05.2022: NEW-Operatoren durch Dependency Injection ersetzen?
     DATA alv_scheme_builder TYPE REF TO /drt/if_cd_alv_scheme_builder.
@@ -60,6 +61,7 @@ METHOD /ruif/if_model~load_model_with_data.
     delete_not_needed_entries( ).    
 
     "ALV-Scheme-Builder in eigenem File im Github analysiert -> Produkt-Flexibilität durch Decorator-Pattern realisieren!
+    " https://github.com/iBS-SRT-ORG/ProzessanzeigeRefactor/blob/main/KlassenUndIhreRefakStellen/cl_cd_alv_scheme_builder/build_alv_table_scheme
     me->model_data-cust_display_alv_scheme = NEW /drt/cl_cd_alv_scheme_builder( )->/drt/if_cd_alv_scheme_builder~build_alv_table_scheme( me->model_data ).
     
     cust_disp_alv_data_carrier = NEW /drt/cl_cd_cust_alv_table_data( me->model_data-cust_display_alv_scheme ).
