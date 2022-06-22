@@ -1,3 +1,24 @@
+Jedes Produkt braucht produktspezifischen Modeldatenhaushalt. Dafür ein universelles Basis-Modeldatenhaushalt-Interface anlegen. Dieses enthält
+Attribute, die jede IPE-Derivat-Prozessanzeige benötigt (Ausgelesene Prozessschritte aus IPE-Einstellungen, Verarbeitungsgruppen, Verarbeitungsgruppen-Zuordnung,
+Datenquellen, Datentargets, anzuzeigende ALV-Tabelle, ALV-Tabellen-Schema, ALV-Tabellen-Komponenten etc.). 
+Produktspezifische Daten des Modeldatenhaushalts müssen dann über spezifische Interfaces implementiert werden (z.B. bei BAIS: Unterscheidung zwischen alter und 
+neuer Prozessschritt-Tabelle - wegen Cash Component -, Dokumentations-Einstellungen aus Systemeinstellungen, Cash-Component-IDs etc.).
+Welcher Modeldatenhaushalt-Implementierung dann in der Model-Klasse vorliegt wird dynamisch zur Laufzeit ausgelesen (muss in irgendeiner Form konfiguriert werden)
+
+
+Vorgehensweise (Änderungen an aktueller VersioN):
+- am Anfang mittels Konfiguration das produktspezifische Modeldatenhaushalts-Objekt instanziieren (SimpleFactory oder AbstractFactory)
+- Selection-Screen-Auswahl über setter-Methode im Modeldatanhaushalt setzen.
+- Process-Step-List-Creator als Klasse modellieren -> Attribute: Selection-Screen-Auswahl (übergeben in Konstruktor) und eigentliche Process-Step-List, API mit Methode
+  'create_process_step_list' -> über Decorator erweiterbar machen (zB für BAIS mit 'split_differentiation_criteria'? oder gar keinen Process-Step-List-Creator extra-
+  hieren, sondern create_process_step_list in Model lassen und bei anschließendem setter-Aufruf der Modeldatenhaushalt-Klasse individuelle Implementierungen vornehmen?
+  Also dass hier bei BAIS-Modeldatenhaushalt-Klasse dann in der setter-Methode split_differentiation_criteria ausgeführt wird?
+- dann über get_process_step_list die erstellte Process-Step-List zurückholen und über set_process_step_list Modeldatenhaushalt.Objekt übergeben
+- read_model_data_frm_img_tables eventuell komplett in Strategie-Objekt auslagern? 
+- prüfen, ob delete_not_needed_entries so universell für IPE-Derivat-Prozessanzeigen gilt oder BAIS-spezifisch
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 METHOD /ruif/if_model~load_model_with_data.
     "ToDo SeSe 13.05.2022: NEW-Operatoren durch Dependency Injection ersetzen?
     DATA alv_scheme_builder TYPE REF TO /drt/if_cd_alv_scheme_builder.
