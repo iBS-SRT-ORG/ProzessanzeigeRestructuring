@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_INTF" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOINTERF>
+    <CLSNAME>/DRT/IF_CD_MODEL_DATA_ACCESSOR</CLSNAME>
+    <LANGU>D</LANGU>
+    <DESCRIPT>Zugriffsoperationen auf diverse C/E/S-Tabellen</DESCRIPT>
+    <EXPOSURE>2</EXPOSURE>
+    <STATE>1</STATE>
+    <UNICODE>X</UNICODE>
+   </VSEOINTERF>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/IF_CD_MODEL_DATA_ACCESSOR</CLSNAME>
+     <CMPNAME>READ_CASH_COMPONENTS_ASSGNMENT</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>liest Cash-Component-Zuordnungen aus:/ibs/cbs_comp_id</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/IF_CD_MODEL_DATA_ACCESSOR</CLSNAME>
+     <CMPNAME>READ_DIFFERENTIATION_CRITERIA</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>liest Differenzierungsmerkmale zu Prozess aus: /ibs/vbs_prod</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/IF_CD_MODEL_DATA_ACCESSOR</CLSNAME>
+     <CMPNAME>READ_PP_GROUPS</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>liest Verarbeitungsgruppen aus: /ipe/c_pp_grp</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/IF_CD_MODEL_DATA_ACCESSOR</CLSNAME>
+     <CMPNAME>READ_PP_GROUP_ASSIGNS</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>Zuweisung Verarb.gruppen zu Proz.schritte:/ipe/c_pp_grp_as</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/IF_CD_MODEL_DATA_ACCESSOR</CLSNAME>
+     <CMPNAME>READ_SOURCE_TABLES</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>liest Quelltabellen der Prozessanzeige aus</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/IF_CD_MODEL_DATA_ACCESSOR</CLSNAME>
+     <CMPNAME>READ_SRT_DOCUMENTATION</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>liest SRT-Dokumentation aus: /ibs/csr_wdoku</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/IF_CD_MODEL_DATA_ACCESSOR</CLSNAME>
+     <CMPNAME>READ_TARGET_CONFIG_FRM_BUFFER</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>liest Datenzieleinstellungen aus: /ibs/cbs_write_d</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

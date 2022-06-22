@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/DRT/CL_CD_ALV_SCHEME_BUILDER</CLSNAME>
+    <LANGU>D</LANGU>
+    <DESCRIPT>Baut das ALV-Tabellenschema auf, füllt Tabelle mit daten</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_ALV_SCHEME_BUILDER</CLSNAME>
+     <CMPNAME>ADD_CERTAIN_DIFF_CAT_COMPONENT</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>Für DFVAL XX_PRODDIFCAT!CC Spalte in Feldcatalog einfügen</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_ALV_SCHEME_BUILDER</CLSNAME>
+     <CMPNAME>ASSURE_NAME_STAYS_UNAMBIGOUS</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>stellt sicher, dass jeder Feldname im ALV eindeutig bleibt</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_ALV_SCHEME_BUILDER</CLSNAME>
+     <CMPNAME>CREATE_ALV_SCHEME_FOUNDATION</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>Bildet das Grundgerüst des ALV-Schemas über RTTS und Struktu</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_ALV_SCHEME_BUILDER</CLSNAME>
+     <CMPNAME>EXTEND_ALV_SCHEME_DYNAMICALLY</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>erweitert ALV-Tabellenschema dynamisch um Diff.merkmale</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_ALV_SCHEME_BUILDER</CLSNAME>
+     <CMPNAME>EXTEND_ALV_SCHEME_STATICALLY</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>fügt statisch Felder zum ALV-Schema hinzu</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_ALV_SCHEME_BUILDER</CLSNAME>
+     <CMPNAME>IS_DFVAL_IN_PROD_DIFF_TAB</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>ist übergebenes Diff.merkmal in C-Tabelle vorhanden?</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_ALV_SCHEME_BUILDER</CLSNAME>
+     <CMPNAME>IS_FIELD_NAME_MATCHES_PATTERN</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>beginnt Feldname mit Buchstabe, Underscore oder Slash?</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_ALV_SCHEME_BUILDER</CLSNAME>
+     <CMPNAME>PUT_GIVEN_STRING_IN_FRONT</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>stellt übergebene Zeichenkette übergebenen String voran</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

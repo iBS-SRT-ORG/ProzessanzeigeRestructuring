@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/DRT/CL_CD_MODEL</CLSNAME>
+    <LANGU>D</LANGU>
+    <DESCRIPT>Model-Klasse für Prozessanzeige</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_MODEL</CLSNAME>
+     <CMPNAME>CREATE_SORTED_PROCSS_STEP_LIST</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>erzeugt sortierte Prozessschrittliste (lesen über Factory)</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_MODEL</CLSNAME>
+     <CMPNAME>SPLIT_DIFFERENTIATION_CRITERIA</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>erweit. Diff.merkmal wird gespilttet in Diff.merkmal und CK</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

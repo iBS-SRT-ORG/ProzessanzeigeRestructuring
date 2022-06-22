@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>/DRT/CL_CD_CC_CHECKER_CREATOR</CLSNAME>
+    <LANGU>D</LANGU>
+    <DESCRIPT>erzeugt das Cash-Component-Abfrageobjekt (aktiv?)</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_CC_CHECKER_CREATOR</CLSNAME>
+     <CMPNAME>CAST_CC_CHECKER</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>casted Cash-Component-Checker auf benötigten Typen</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>/DRT/CL_CD_CC_CHECKER_CREATOR</CLSNAME>
+     <CMPNAME>GET_CC_CHECKER_FROM_ENGINE</CMPNAME>
+     <LANGU>D</LANGU>
+     <DESCRIPT>holt Cash-Component-Checker aus der Engine</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>
