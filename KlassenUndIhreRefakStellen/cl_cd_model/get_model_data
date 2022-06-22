@@ -1,9 +1,9 @@
 Vorgehensweise zur Verallgemeinerung der Prozessanzeige
 
-Statt model_data bleibt keine Tabelle der Model-Klasse, sondern wird in ein Objekt transformiert. Diese wird gegen ein allgemeines Interface implementiert, welches
+model_data bleibt keine Tabelle der Model-Klasse, sondern wird in ein Objekt transformiert. Diese wird gegen ein allgemeines Interface implementiert, welches
 ein universellen Modeldatenhaushalt einer IPE-Derivat-Prozessanzeige verkörpert 
-(siehe https://github.com/iBS-SRT-ORG/ProzessanzeigeRefactor/blob/main/KlassenUndIhreRefakStellen/cl_cd_model/load_model_with_data). Dementsprechend muss die vorliegende
-Methode geändert werden.  
+(siehe https://github.com/iBS-SRT-ORG/ProzessanzeigeRefactor/blob/main/KlassenUndIhreRefakStellen/cl_cd_model/load_model_with_data). 
+Dementsprechend muss die vorliegende Methode geändert werden.  
 
 (aktuell)
 METHOD /ruif/if_model~get_model_data.
