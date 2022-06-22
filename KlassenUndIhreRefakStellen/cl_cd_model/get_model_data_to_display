@@ -1,0 +1,12 @@
+aktuell:
+
+METHOD /ruif/if_model~get_model_data_to_display.
+  model_data_to_display = model_data-tab_alv_data_to_display.
+ENDMETHOD.
+  
+neu:
+
+METHOD /ruif/if_model~get_model_data_to_display.
+  model_data_to_display = me->model_data->get_alv_data_to_display( ).
+ENDMETHOD.
+  
