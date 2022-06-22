@@ -77,3 +77,62 @@ METHOD /ruif/if_model~load_model_with_data.
     model_data-tab_alv_data_to_display = cust_disp_alv_data_carrier->get_ref_alv_table_data( ).
     
   ENDMETHOD.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+neu:
+METHOD constructor.
+  "hier gibt es das produktspezifische Modeldatenhaushalt-Objekt zurück. Wo kommt product_specific_factory her? Config-Objekt? Application-Objekt?
+  me->model_data = me->product_specific_factory=>create_model_data_object( ).
+ENDMETHOD.
+---------------------------------------------
+METHOD /ruif/if_model~load_model_with_data.
+    "Untermethode: set_selection_screen_selection_to_model_data( ). (zu langer Name -.-)
+    ASSIGN data->* TO FIELD-SYMBOL(<selection_screen_selection>).
+    me->model_data->set_selection_screen_selection( <selection_screen_selection> ).
+    
+    "Untermethode: create_process_step_list( ).
+    DATA(process_step_list_creator) = me->product_specific_factory=>create_process_step_list_creator( me->model_data ).
+    TRY.
+        "Hier drin wird nun das Model produktspezifisch bearbeitet. Der Standard-Process-Step-List-Creator führt immer den Schritt aus, der vorher in der Methode 
+        "'create_sorted_procss_step_list( ) durchgeführt wurde (siehe 'aktuell'). In BAIS wird diese Funktionalität mittels Decorator um 'split_differentiation-criteria'
+        " erweitert. Die richtige "Verpackung" übernimmt die statische Fabrikmethode in der abstrakten Fabrik 'create_process_step_list_creator'.
+        process_step_list_creator->create_sorted_procss_step_list( ).
+      CATCH /ipe/cx_pp_factory INTO DATA(obj_cx_pp_factory).
+        obj_cx_pp_factory->supply_syst_with_msgpar( ).
+*     Nachrichtentyp "Abbruch" wird in "Fehler" umgesetzt, um das
+*     Verlassen der aktuellen Transaktion, i.d.R. SPRO zu vermeiden
+        IF sy-msgty EQ /ipe/cx_pp_factory=>co_msgty_abort.
+          sy-msgty = /ipe/cx_pp_factory=>co_msgty_error.
+        ENDIF.
+        MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDTRY.
+    
+    "Untermethode: abort_if_no_process_steps_found( ).
+    IF me->model_data->get_pp_process_step_list( ) IS INITIAL.
+      " Keine Prozessschritte dazu gefunden
+      MESSAGE e002(/drt/cd_messages).
+    ENDIF.
+    
+    "Untermethode: read_model_data_frm_img_tables( ).
+    DATA(model_img_table_reader) = me->product_specific_factory=>create_img_table_reader( ).
+    model_img_table_reader->read_model_data_frm_img_tables( me->model_data ).
+    
+    delete_not_needed_entries( ).   
+    
+    "Untermethode: create_alv_table_scheme( ).
+    DATA(alv_components_builder) = me->product_specific_factory=>create_alv_components_builder( ).
+    DATA(alv_components) = alv_components_builder->build_alv_table_scheme( me->model_data ).
+    TRY.
+      me->model_data->set_alv_table_scheme( cl_abap_structdescr=>create( ref_tab_cd_alv_components->* ).
+        CATCH cx_sy_struct_creation.
+    ENDTRY.
+    
+    "Untermethode: create_alv_table_data_to_display( ).
+    DATA(alv_table_data_carrier) = me->product_specific_factory=>create_alv_table_data_carrier( me->model_data->get_alv_table_scheme ).
+    
+    "enrich_alv_data fällt weg -> wird nun durch Decorator erledigt, die richtige Verpackung erfolgte in der abstrakten Fabrik.
+    alv_table_data_carrier->create_alv_data( me->model_data ).
+    
+    model_data-tab_alv_data_to_display = cust_disp_alv_data_carrier->get_ref_alv_table_data( ).
+    
+  ENDMETHOD.
