@@ -1,0 +1,154 @@
+- aktuell enthält die Methode noch BAIS-spezifische Logik
+- im Standard runterreduziert auf den grundlegendsten, universellen Fall -> also keine Diff.merkmale liegen vor, jeder Eintrag aus dem Customizing wird in die Tabelle
+  hinzugefügt -> siehe CATCH-Block, der diesen grundlegenden Fall abbildet sobald in der Abstract Factory keine spezielle Strategie zur Vorgehensweise für den Aufbau
+  der ALV-Tabelle vorliegt (im Gegensatz zu BAIS, wo die Strategie eine Vorgehensweise zu Diff.merkmalen und Cash-Component vorsieht)
+- dazu muss allerdings auch die Klasse für ALV-Entry verändert werden, das Interface muss segregiert wreden. Aktuell enthält es noch viele BAIS-spezifische Operationen.
+  Für diese benötigt es jedoch ein spezifisches Interface, das Casting findet dann an der Stelle statt, wo diese Operationen benötigt werden.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+aktuell:
+
+METHOD transfer_pp_cus_disp_to_alv.
+    DATA currently_iterated_pp_entry TYPE REF TO /drt/if_cd_pp_cust_entry.
+    DATA alv_entry_to_add TYPE REF TO /drt/if_cd_cust_alv_entry.
+
+    LOOP AT model_data-tab_pp_cus_display ASSIGNING FIELD-SYMBOL(<currently_iterated_pp_entry>).
+      DATA(table_index) = sy-tabix.
+      currently_iterated_pp_entry = NEW /drt/cl_cd_pp_cust_entry(
+                                            pp_customizing_entry       = <currently_iterated_pp_entry>
+                                            selection_screen_selection = selection_screen_selection ).
+
+      IF is_first_iterated_entry( table_index ).
+        alv_entry_to_add = /drt/cl_cd_alv_entry_factory=>create_alv_entry_from_pp_entry(
+                                                            pp_cus_entry            = currently_iterated_pp_entry
+                                                            cust_display_alv_scheme = cust_display_alv_scheme
+                                                            model_data              = model_data ).
+        CONTINUE.
+      ENDIF.
+
+      IF alv_entry_to_add->is_key_identical_to( currently_iterated_pp_entry ).
+        "Key ist identisch, heißt: kein neuer Prozessschritt, sodnern Differenzierungsmerkmal liegt vor -> in hinzuzufügenden ALV-Eintrag das gerade iterierte Diff.merkmal korrekt befüllen
+        alv_entry_to_add->fill_iterated_dif_crit_field(
+                              model_data                  = model_data
+                              currently_iterated_pp_entry = currently_iterated_pp_entry ).
+        "hier verstehe ich den fachlihen Hintergrund nicht. Liegt eine Cash-Component vor, wird gsechaut, ob das Diff-merkmal in der Diffmerkmal-Customizingtabelle vorkommt. Wenn nicht
+        "wird zur Prozessanzeige ein neuer Eintrag hinzugefügt.
+        IF NOT currently_iterated_pp_entry->has_cash_component( ).
+          CONTINUE.
+        ENDIF.
+        IF NOT line_exists( model_data-tab_differentiation_criteria[ prod_dif_cat = currently_iterated_pp_entry->get_differentiation_criteria( ) ] ).
+          DATA(new_entry_to_be_inserted) = /drt/cl_cd_alv_entry_factory=>create_alv_entry_from_pp_entry(
+                                                                              pp_cus_entry            = currently_iterated_pp_entry
+                                                                              cust_display_alv_scheme = cust_display_alv_scheme
+                                                                              model_data              = model_data ).
+          me->insert_new_entry_to_alv_table( new_entry_to_be_inserted->get_cust_display_alv_entry( ) ).
+        ENDIF.
+
+      ELSE.
+        "Key nicht identisch -> neuer Prozesschritt -> Datensatz wegschreiben, Infos merken (für nächste Iteration)
+        me->insert_new_entry_to_alv_table( alv_entry_to_add->get_cust_display_alv_entry( ) ).
+        FREE alv_entry_to_add.
+        alv_entry_to_add = /drt/cl_cd_alv_entry_factory=>create_alv_entry_from_pp_entry(
+                                                             pp_cus_entry            = currently_iterated_pp_entry
+                                                             cust_display_alv_scheme = cust_display_alv_scheme
+                                                             model_data              = model_data ).
+      ENDIF.
+      FREE currently_iterated_pp_entry.
+    ENDLOOP.
+    me->insert_new_entry_to_alv_table( alv_entry_to_add->get_cust_display_alv_entry( ) ).
+    FREE alv_entry_to_add.
+  ENDMETHOD.
+  ---------------------------------------------------------------------------------------------------------------------------------------------------
+  neu:
+  
+  METHOD transfer_pp_cus_disp_to_alv.
+    DATA currently_iterated_pp_entry TYPE REF TO /drt/if_cd_pp_cust_entry.
+    DATA alv_entry_to_add TYPE REF TO /drt/if_cd_cust_alv_entry.
+
+    LOOP AT model_data-tab_pp_cus_display ASSIGNING FIELD-SYMBOL(<currently_iterated_pp_entry>).
+      DATA(table_index) = sy-tabix.
+      currently_iterated_pp_entry = NEW /drt/cl_cd_pp_cust_entry(
+                                            pp_customizing_entry       = <currently_iterated_pp_entry>
+                                            selection_screen_selection = selection_screen_selection ).
+
+      IF is_first_iterated_entry( table_index ).
+        alv_entry_to_add = /drt/cl_cd_alv_entry_factory=>create_alv_entry_from_pp_entry(
+                                                            pp_cus_entry            = currently_iterated_pp_entry
+                                                            cust_display_alv_scheme = cust_display_alv_scheme
+                                                            model_data              = model_data ).
+        CONTINUE.
+      ENDIF.
+      
+      TRY.
+        "hole Abstract Factory-Objekt über Konfiguration beispielsweise, dann:
+        DATA(strategy_for_adding_new_entry) = abstract_factory=>create_strategy_for_adding_entry.
+        strategy_for_adding_new_entry->exceute( alv_entry_to_add, me->ref_alv_table_data).
+        "hier drin dann beispielsweise die BAIS-Implementierung: 
+        
+      IF alv_entry_to_add->is_key_identical_to( currently_iterated_pp_entry ).
+        "Key ist identisch, heißt: kein neuer Prozessschritt, sodnern Differenzierungsmerkmal liegt vor -> in hinzuzufügenden ALV-Eintrag das gerade iterierte Diff.merkmal korrekt befüllen
+        alv_entry_to_add->fill_iterated_dif_crit_field(
+                              model_data                  = model_data
+                              currently_iterated_pp_entry = currently_iterated_pp_entry ).
+        "hier verstehe ich den fachlihen Hintergrund nicht. Liegt eine Cash-Component vor, wird gsechaut, ob das Diff-merkmal in der Diffmerkmal-Customizingtabelle vorkommt. Wenn nicht
+        "wird zur Prozessanzeige ein neuer Eintrag hinzugefügt.
+        IF NOT currently_iterated_pp_entry->has_cash_component( ).
+          CONTINUE.
+        ENDIF.
+        IF NOT line_exists( model_data-tab_differentiation_criteria[ prod_dif_cat = currently_iterated_pp_entry->get_differentiation_criteria( ) ] ).
+          DATA(new_entry_to_be_inserted) = /drt/cl_cd_alv_entry_factory=>create_alv_entry_from_pp_entry(
+                                                                              pp_cus_entry            = currently_iterated_pp_entry
+                                                                              cust_display_alv_scheme = cust_display_alv_scheme
+                                                                              model_data              = model_data ).
+          me->insert_new_entry_to_alv_table( new_entry_to_be_inserted->get_cust_display_alv_entry( ) ).
+        ENDIF.
+
+      ELSE.
+        "Key nicht identisch -> neuer Prozesschritt -> Datensatz wegschreiben, Infos merken (für nächste Iteration)
+        me->insert_new_entry_to_alv_table( alv_entry_to_add->get_cust_display_alv_entry( ) ).
+        FREE alv_entry_to_add.
+        alv_entry_to_add = /drt/cl_cd_alv_entry_factory=>create_alv_entry_from_pp_entry(
+                                                             pp_cus_entry            = currently_iterated_pp_entry
+                                                             cust_display_alv_scheme = cust_display_alv_scheme
+                                                             model_data              = model_data ).
+      ENDIF.
+          CATCH. "keine spezielle Strategie liegt vor, z.B. bei einfachem IPE-Prozessanzeige-Derivat ohne Diff.merkmale, dann kann immer direkt hinzugefügt werden.
+            me->insert_new_entry_to_alv_table( alv_entry_to_add->get_cust_display_alv_entry( ) ).
+            FREE alv_entry_to_add.
+            alv_entry_to_add = /drt/cl_cd_alv_entry_factory=>create_alv_entry_from_pp_entry(
+                                                                 pp_cus_entry            = currently_iterated_pp_entry
+                                                                 cust_display_alv_scheme = cust_display_alv_scheme
+                                                                 model_data              = model_data ).
+      ENDTRY.
+
+      IF alv_entry_to_add->is_key_identical_to( currently_iterated_pp_entry ).
+        "Key ist identisch, heißt: kein neuer Prozessschritt, sodnern Differenzierungsmerkmal liegt vor -> in hinzuzufügenden ALV-Eintrag das gerade iterierte Diff.merkmal korrekt befüllen
+        alv_entry_to_add->fill_iterated_dif_crit_field(
+                              model_data                  = model_data
+                              currently_iterated_pp_entry = currently_iterated_pp_entry ).
+        "hier verstehe ich den fachlihen Hintergrund nicht. Liegt eine Cash-Component vor, wird gsechaut, ob das Diff-merkmal in der Diffmerkmal-Customizingtabelle vorkommt. Wenn nicht
+        "wird zur Prozessanzeige ein neuer Eintrag hinzugefügt.
+        IF NOT currently_iterated_pp_entry->has_cash_component( ).
+          CONTINUE.
+        ENDIF.
+        IF NOT line_exists( model_data-tab_differentiation_criteria[ prod_dif_cat = currently_iterated_pp_entry->get_differentiation_criteria( ) ] ).
+          DATA(new_entry_to_be_inserted) = /drt/cl_cd_alv_entry_factory=>create_alv_entry_from_pp_entry(
+                                                                              pp_cus_entry            = currently_iterated_pp_entry
+                                                                              cust_display_alv_scheme = cust_display_alv_scheme
+                                                                              model_data              = model_data ).
+          me->insert_new_entry_to_alv_table( new_entry_to_be_inserted->get_cust_display_alv_entry( ) ).
+        ENDIF.
+
+      ELSE.
+        "Key nicht identisch -> neuer Prozesschritt -> Datensatz wegschreiben, Infos merken (für nächste Iteration)
+        me->insert_new_entry_to_alv_table( alv_entry_to_add->get_cust_display_alv_entry( ) ).
+        FREE alv_entry_to_add.
+        alv_entry_to_add = /drt/cl_cd_alv_entry_factory=>create_alv_entry_from_pp_entry(
+                                                             pp_cus_entry            = currently_iterated_pp_entry
+                                                             cust_display_alv_scheme = cust_display_alv_scheme
+                                                             model_data              = model_data ).
+      ENDIF.
+      FREE currently_iterated_pp_entry.
+    ENDLOOP.
+    me->insert_new_entry_to_alv_table( alv_entry_to_add->get_cust_display_alv_entry( ) ).
+    FREE alv_entry_to_add.
+  ENDMETHOD.
