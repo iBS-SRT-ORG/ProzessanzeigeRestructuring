@@ -1,0 +1,118 @@
+aktuell: 
+
+METHOD /drt/if_cd_alv_scheme_builder~build_alv_table_scheme.
+  DATA(ref_tab_cd_alv_components) = create_alv_scheme_foundation( ).
+  "ToDo: mMn könnte dieser Schritt - wie auch beim Feldkatalog - obsolet sein. Einfach die passende Struktur anlegen.
+  extend_alv_scheme_statically( ref_tab_cd_alv_components ).
+
+  extend_alv_scheme_dynamically(
+      tab_differentiation_criteria = tab_model_data-tab_differentiation_criteria
+      ref_tab_cd_alv_components    = ref_tab_cd_alv_components ).
+
+  add_certain_diff_cat_component(
+      ref_tab_alv_components       = ref_tab_cd_alv_components
+      tab_pp_cus_display           = tab_model_data-tab_pp_cus_display
+      tab_differentiation_criteria = tab_model_data-tab_differentiation_criteria
+  ).
+  TRY.
+      rtts_alv_table_scheme = cl_abap_structdescr=>create( ref_tab_cd_alv_components->* ).
+    CATCH cx_sy_struct_creation.
+  ENDTRY.
+ENDMETHOD.
+----------------------------------------------------------------------------------------- 
+neu:
+- die statsiche Erweiterung 'extend_alv_scehem_statically' erscheint mir unnötig, 
+  stattdessen einfach eine produktspezifische Struktur anlegen, die die zusätzlich benötigten Felder bereits enthält.
+- der TRY-CATCH-Block wird eine Ebene höher in die Model-Klasse verlagert. Auf diese Art und Weise bessere Umsetzung des Decorator-Patterns möglich.
+- In der neuen Fassung wird als Grundlage (siehe neue Methodenimplementierung) nur noch die Foundation gebildet mittels 'create_alv_scheme_foundation'. 
+  Die dynamische Erweiterung der ALV-Komponenten, z.B. mittels Differenzierungsmerkmalen (betrifft z.B. BAIS, aber auch andere IPE-Prozessanzeigen-Derivate, wenn ich
+  mich richtig erinnere) und das für BAIS-spezifische 'add_certain_diff_cat_component' werden mittels Decorator implementiert.
+- ref_tab_cd_alv_components zu Klassenattribut machen.
+
+METHOD /drt/if_cd_alv_scheme_builder~build_alv_table_scheme.
+  result = create_alv_scheme_foundation( ).
+ENDMETHOD.
+-----------------------------------------------------------------------------------------------
+skizzenhafte Decorator-Implementierung für das zusätzliche Verhalten
+
+"Decorator-Base-Klasse
+CLASS /ipe/cl_cd_alv_scheme_decoratr DEFINTIION
+  PUBLIC    
+    CREATE PUBLIC .
+
+    PUBLIC SECTION.
+      INTERFACES /ipe/if_cd_alv_scheme_builder.
+      METHODS constructor
+        IMPORTING
+          wrappee TYPE REF TO /ipe/if_cd_alv_scheme_builder
+    PROTECTED SECTION.
+    PRIVATE SECTION.
+      DATA wrappee TYPE REF TO /drt/if_cd_alv_scheme_builder
+ENDCLASS
+
+CLASS /ipe/cl_cd_alv_scheme_decoratr IMPLEMENTATION.
+  METHOD /ipe/if_cd_alv_scheme_builder~build_alv_table_scheme.
+    result = me->wrappee->/ipe/if_cd_alv_scheme_builder~build_alv_table_scheme( ).
+  ENDMETHOD.
+ENDCLASS.
+
+"ab hier -> konkrete Decorator-Implementierungen: Reihenfolge...erst Decorator für 'extend_alv_scheme_dyamically', dann Decorator für add_certain_diff_cat_component'
+
+"konkrete Decorator-Implementierung für BAIS und andere Produkte 'extend_alv_scheme_dynamically'
+
+"konkrete Decorator-Implementierung für BAIS 'add_certain_diff_cat_component'
+
+CLASS /bais/cl_cd_alv_scheme_decorator DEFINTIION
+  PUBLIC
+    INHERTING FROM /ipe/cl_cd_alv_scheme_decoratr
+    FINAL
+    CREATE PUBLIC .
+
+    PUBLIC SECTION.
+      METHODS /ipe/if_cd_alv_scheme_builder~build_alv_table_scheme REDEFINITION.
+    PROTECTED SECTION.
+    PRIVATE SECTION.
+     METHODS add_certain_diff_cat_component
+      IMPORTING
+        !ref_tab_alv_components       TYPE REF TO abap_component_tab
+        !tab_pp_cus_display           TYPE /drt/ty_pp_cus_display
+        !tab_differentiation_criteria TYPE /ibs/tybs_proddis.
+    METHODS assure_name_stays_unambigous
+      IMPORTING
+        !differentiation_criteria TYPE /ipe/e_dfval
+        !tab_alv_components       TYPE abap_component_tab
+      RETURNING
+        VALUE(alv_field_name)     TYPE char35 .
+    METHODS is_dfval_in_prod_diff_tab
+      IMPORTING
+        !differentiation_criteria     TYPE /ipe/e_dfval
+        !tab_differentiation_criteria TYPE /ibs/tybs_proddis
+      RETURNING
+        VALUE(result)                 TYPE /drt/e_is_dfval_in_dif_cat_tab .
+    METHODS is_field_already_exists_in_alv
+      IMPORTING
+        !alv_field_name     TYPE char35
+        !tab_alv_components TYPE abap_component_tab
+      RETURNING
+        VALUE(result)       TYPE flag .
+    METHODS is_field_name_matches_pattern
+      IMPORTING
+        !alv_field_name TYPE char35
+      RETURNING
+        VALUE(result)   TYPE flag .
+    METHODS put_given_string_in_front
+      IMPORTING
+        !string_to_put_at_front TYPE char35
+        !string_to_extend       TYPE char35
+      RETURNING
+        VALUE(extended_string)  TYPE char35 .
+
+ENDCLASS
+
+CLASS /bais/cl_cd_alv_scheme_decorator IMPLEMENTATION.
+  METHOD /ipe/if_cd_alv_scheme_builder~build_alv_table_scheme REDEFINITION.
+    DATA(dynamically_extended_alv_scheme) = super->/ipe/if_cd_alv_scheme_builder~build_alv_table_scheme( ).
+    result = 
+    
+  ENDMETHOD.
+ENDCLASS.
