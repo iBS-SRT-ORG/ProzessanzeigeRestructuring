@@ -29,4 +29,6 @@ aktuell:
 neu:  
 - komplett in ein Strategie-Objekt verlagern, wird mittels Abstract Factory zurückgeliefert, der Code in "aktuell" wäre dann bspw. verlagert in das BAIS-Strategieobjekt.
   Parameter der Strategie-Methode: me->cust_display_alv_entry, currently_iterated_pp_entry, model_data
+- das fill_cash_component muss dann in TRY eines TRY-Catch-Blocks gepackt werden....sobald eine der IF-Bedingungen in dem Strategie-OBjekt erreicht wurde ->
+  Exception schmeißen --> filL_cash_component wird nicht mehr erreicht und nciht ausgeführt (da ja in TRY-Block).
 - DRT beispielsweise hätte keine eigene Strategie -> könnte im TRY-CATCH, dann in den Catch springen.
