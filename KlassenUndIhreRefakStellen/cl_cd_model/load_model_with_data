@@ -114,8 +114,8 @@ METHOD /ruif/if_model~load_model_with_data.
     ENDIF.
     
     "Untermethode: read_model_data_frm_img_tables( ).
-    DATA(model_img_table_reader) = me->product_specific_factory=>create_img_table_reader( ).
-    model_img_table_reader->read_model_data_frm_img_tables( me->model_data ).
+    DATA(strategy_for_reading_img_tbles) = me->product_specific_factory=>create_img_table_reader( ).
+    strategy_for_reading_img_tbles->read_model_data_frm_img_tables( me->model_data ).
     
     delete_not_needed_entries( ).   
     
