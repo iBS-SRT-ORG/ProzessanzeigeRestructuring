@@ -1,0 +1,32 @@
+aktuell: 
+
+    ASSIGN me->cust_display_alv_entry->* TO FIELD-SYMBOL(<cust_display_alv_entry>).
+    ASSIGN COMPONENT currently_iterated_pp_entry->get_differentiation_criteria( ) OF STRUCTURE <cust_display_alv_entry> TO FIELD-SYMBOL(<differentiation_criteria>).
+    DATA(str_crrently_iterated_pp_entry) = currently_iterated_pp_entry->get_pp_customizing_entry( ).
+
+    IF <differentiation_criteria> IS NOT ASSIGNED.
+      RETURN.
+    ENDIF.
+    IF currently_iterated_pp_entry->is_diff_criteria_inactive( ).
+      <differentiation_criteria> = 'AUSGESCHALTET'(001).
+      RETURN.
+    ENDIF.
+    IF currently_iterated_pp_entry->is_cash_comp_exists_but_deact( ).
+      <differentiation_criteria> = 'inaktive Cash-Komponente'(002).
+      RETURN.
+    ENDIF.
+    IF currently_iterated_pp_entry->is_function_set_exists( ).
+      <differentiation_criteria> = str_crrently_iterated_pp_entry-classname && ' (' && str_crrently_iterated_pp_entry-func_set && ')'.
+      RETURN.
+    ENDIF.
+    IF me->/drt/if_cd_cust_alv_entry~is_diff_cls_not_eq_to_std_cls( str_crrently_iterated_pp_entry-classname ).
+      <differentiation_criteria> = str_crrently_iterated_pp_entry-classname.
+      me->fill_cash_component(
+             model_data                  = model_data
+             currently_iterated_pp_entry = currently_iterated_pp_entry ).
+    ENDIF.
+    
+neu:  
+- komplett in ein Strategie-Objekt verlagern, wird mittels Abstract Factory zurückgeliefert, der Code in "aktuell" wäre dann bspw. verlagert in das BAIS-Strategieobjekt.
+  Parameter der Strategie-Methode: me->cust_display_alv_entry, currently_iterated_pp_entry, model_data
+- DRT beispielsweise hätte keine eigene Strategie -> könnte im TRY-CATCH, dann in den Catch springen.
