@@ -1,3 +1,14 @@
+Diese Methode entfällt!!! es existiert nur noch create_alv_data in der API. Sämtliche Sonderlocken (Färbung, Ermittlung der Werte für spezifische Spalten obliegt
+nun speziellen Decorator Subklassen).
+Dafür würde tatsächlich das Refacotring 'Split Loop' angewendet, heißt in jeder dieser Decorator-Klassen würde über die ALV-Tabellendaten gelooped und sie entsprech-
+end bearbeitet werden. Möglicherweise Perfomance-Verlust, aber dadurch Entkopplung, Auflösung von Abhängigkeiten.
+Dafür notwendig eine produktspezifische Rückgabe des ALV-Entry-Objekts über die abstrakte Fabrik. 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 aktuell: 
 
 METHOD /drt/if_cd_cust_alv_table_data~enrich_alv_data.
@@ -92,20 +103,43 @@ METHOD /drt/if_cd_cust_alv_table_data~enrich_alv_data.
       ENDLOOP.
     ENDIF. "  ckf_name is not INITIAL.
   ENDMETHOD.
-  
-  
-------------------------------------------------------------------------------------------------------------------------------------------------------------  
-------------------------------------------------------------------------------------------------------------------------------------------------------------  
-------------------------------------------------------------------------------------------------------------------------------------------------------------  
-------------------------------------------------------------------------------------------------------------------------------------------------------------  
-------------------------------------------------------------------------------------------------------------------------------------------------------------  
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  neu:
-  
-  diese Methode entfällt!!! es existiert nur noch create_alv_data in der API. Sämtliche Sonderlocken (Färbung, Ermittlung der Werte für spezifische Spalten obliegt
-  nun speziellen Decorator Subklassen).
-  Dafür würde tatsächlich das Refacotring 'Split Loop' angewendet, heißt in jeder dieser Decorator-Klassen würde über die ALV-Tabellendaten gelooped und sie entsprech-
-  end bearbeitet werden. Möglicherweise Perfomance-Verlust, aber dadurch Entkopplung, Auflösung von Abhängigkeiten.
+neu:
+
+Beispielhafte Decorator-Klasse, die die Einträge färbt (Feature bei BAIS).
+
+CLASS alv_data_decorator_color_bais.
+
+"hier die Dekoration/Redefinition des Basis-Verhaltens
+METHOD create_alv_data REDEFINITION.
+    super->create_alv_data( ).
+    
+    me->create_int_and_ext_dif_tables(
+      EXPORTING
+        model_data          = model_data
+      IMPORTING
+        tab_prod_dif_intern = DATA(tab_prod_dif_extern)
+        tab_prod_dif_extern = DATA(tab_prod_dif_intern) ).
+
+    DATA(obj_color_rows) = NEW /ibs/cl_src_cus_disp_alv_out(
+                                  im_tab_prod_dif_intern = tab_prod_dif_intern
+                                  im_tab_prod_dif_extern = tab_prod_dif_extern
+                                  im_tab_pp_grp_as       = model_data-tab_pp_groups_assigned
+                                  im_tab_proddif_disp    = model_data-tab_differentiation_criteria
+                                  im_tab_pp_grp          = model_data-tab_pp_groups
+                                  im_tab_pp_cus_disp_alt = model_data-tab_pp_cus_display_old ).
+    
+    FIELD-SYMBOLS: <alv_table_data> TYPE STANDARD TABLE.
+    ASSIGN me->ref_alv_table_data->* TO <alv_table_data>.
+    
+    LOOP AT <alv_table_data> ASSIGNING FIELD-SYMBOL(<alv_entry>).
+        DATA(alv_entry) = me->bais_abstract_factory=>create_alv_entry( <alv_entry>, me->alv_table_scheme ).
+        
+ENDMETHOD.
   
   
