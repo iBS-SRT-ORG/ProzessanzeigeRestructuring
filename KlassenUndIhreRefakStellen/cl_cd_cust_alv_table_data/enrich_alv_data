@@ -1,0 +1,111 @@
+aktuell: 
+
+METHOD /drt/if_cd_cust_alv_table_data~enrich_alv_data.
+    DATA cust_display_entry TYPE REF TO /drt/if_cd_cust_alv_entry.
+    FIELD-SYMBOLS <tab_alv_cust_display> TYPE STANDARD TABLE.
+
+    create_int_and_ext_dif_tables(
+      EXPORTING
+        model_data          = model_data
+      IMPORTING
+        tab_prod_dif_intern = DATA(tab_prod_dif_extern)
+        tab_prod_dif_extern = DATA(tab_prod_dif_intern) ).
+
+    DATA(obj_color_rows) = NEW /ibs/cl_src_cus_disp_alv_out(
+                                  im_tab_prod_dif_intern = tab_prod_dif_intern
+                                  im_tab_prod_dif_extern = tab_prod_dif_extern
+                                  im_tab_pp_grp_as       = model_data-tab_pp_groups_assigned
+                                  im_tab_proddif_disp    = model_data-tab_differentiation_criteria
+                                  im_tab_pp_grp          = model_data-tab_pp_groups
+                                  im_tab_pp_cus_disp_alt = model_data-tab_pp_cus_display_old ).
+
+    ASSIGN me->ref_alv_table_data->* TO <tab_alv_cust_display>.
+
+    LOOP AT <tab_alv_cust_display> ASSIGNING FIELD-SYMBOL(<cust_display_entry_in_loop>).
+      cust_display_entry = NEW /drt/cl_cd_cust_alv_entry(
+                                    str_alv_entry           = <cust_display_entry_in_loop>
+                                    cust_display_alv_scheme = me->cust_display_alv_table_scheme ).
+
+      DATA(ref_cust_display_entry) = cust_display_entry->get_cust_display_alv_entry( ).
+      ASSIGN ref_cust_display_entry->* TO FIELD-SYMBOL(<cust_display_entry>).
+
+      obj_color_rows->prepare_data( CHANGING ch_str_alv = <cust_display_entry> ).
+      cust_display_entry->dtrmn_yet_missing_column_info( model_data ).
+      <cust_display_entry_in_loop> = <cust_display_entry>.
+    ENDLOOP.
+    "ToDo: ab hier -> noch nicht refaktorisiert, aus altem Report kopiert.
+**********************************************************************************
+* Erweiterung um Zieltabellen Info bei WRITER Eintrag
+**********************************************************************************
+    DATA: struct     TYPE REF TO cl_abap_structdescr,
+          tab_strucs TYPE cl_abap_structdescr=>component_table,
+          tab_ckf    TYPE STANDARD TABLE OF /ipe/c_ro_cat,
+          ckf_name   TYPE /ipe/e_ckf_strucname.
+
+    FIELD-SYMBOLS:
+      <str_ckf> TYPE /ipe/c_ro_cat,
+      <strucs>  TYPE abap_componentdescr.
+    DATA counter TYPE int4 VALUE 0.
+
+* Über ro_cat die CKF-Struktur des aktuellen ARO ermitteln
+    SELECT * FROM /ipe/c_ro_cat INTO TABLE tab_ckf WHERE ro_cat = selection_screen_selection-reporting_obj_category.
+    READ TABLE tab_ckf ASSIGNING <str_ckf> INDEX 1.
+    ckf_name = <str_ckf>-ckf_struc.
+
+    IF  ckf_name IS NOT INITIAL.
+
+*In der CKF-Struktur enthaltene Strukturen auslesen
+      struct ?= cl_abap_typedescr=>describe_by_name( ckf_name ).
+      tab_strucs = struct->get_components( ).
+
+* Zieltabellen abgleichen und in die ALV übernehmen
+* mögliche Duplikate entfernen
+      DATA(tab_writer_destinations) = model_data-tab_write_destinations.
+      DELETE ADJACENT DUPLICATES FROM tab_writer_destinations COMPARING tabname.
+      LOOP AT model_data-tab_write_destinations ASSIGNING FIELD-SYMBOL(<write_destination>) WHERE flg_is_target EQ /ibs/co_bs_general=>flg_true.
+        LOOP AT tab_strucs TRANSPORTING NO FIELDS
+          WHERE name EQ <write_destination>-komp_name
+          OR    name CS <write_destination>-tabname.
+          APPEND INITIAL LINE TO <tab_alv_cust_display> ASSIGNING <cust_display_entry>.
+          me->append_target_info(
+            EXPORTING
+              im_str_write_d = <write_destination>
+            CHANGING
+              ch_str_alv = <cust_display_entry>
+              ch_counter = counter
+          ).
+          EXIT.
+        ENDLOOP.
+      ENDLOOP.
+**********************************************************************************
+* Erweiterung um Duplikatinformationen
+**********************************************************************************
+      LOOP AT model_data-tab_differentiation_criteria ASSIGNING FIELD-SYMBOL(<str_prod_dif_disp>) WHERE flg_int_ext EQ 'I'.
+        APPEND INITIAL LINE TO <tab_alv_cust_display> ASSIGNING <cust_display_entry>.
+        me->append_dupl_info(
+          EXPORTING
+            im_str_prod_dif_i = <str_prod_dif_disp>
+            model_data    = model_data
+          CHANGING
+            ch_str_alv        = <cust_display_entry>
+        ).
+      ENDLOOP.
+    ENDIF. "  ckf_name is not INITIAL.
+  ENDMETHOD.
+  
+  
+------------------------------------------------------------------------------------------------------------------------------------------------------------  
+------------------------------------------------------------------------------------------------------------------------------------------------------------  
+------------------------------------------------------------------------------------------------------------------------------------------------------------  
+------------------------------------------------------------------------------------------------------------------------------------------------------------  
+------------------------------------------------------------------------------------------------------------------------------------------------------------  
+
+
+  neu:
+  
+  diese Methode entfällt!!! es existiert nur noch create_alv_data in der API. Sämtliche Sonderlocken (Färbung, Ermittlung der Werte für spezifische Spalten obliegt
+  nun speziellen Decorator Subklassen).
+  Dafür würde tatsächlich das Refacotring 'Split Loop' angewendet, heißt in jeder dieser Decorator-Klassen würde über die ALV-Tabellendaten gelooped und sie entsprech-
+  end bearbeitet werden. Möglicherweise Perfomance-Verlust, aber dadurch Entkopplung, Auflösung von Abhängigkeiten.
+  
+  
