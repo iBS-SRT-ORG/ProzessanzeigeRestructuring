@@ -1,0 +1,9 @@
+STRUCTURE /DRT/S_CD_MODEL_DATA
+
+	TAB_DIFFERENTIATION_CRITERIA	/IBS/TYBS_PRODDIS
+	TAB_WDOKU	/IBS/TYSR_WDOKU
+	TAB_WRITE_DESTINATIONS	/IBS/TYBS_WRITE_D
+	TAB_CASH_COMPONENT_IDS	/IBS/TYBS_COMP_ID
+  
+	Alle gelöscht aus Modeldatenhaushalt -> soll ohnehin auf Modelobjekt umgestellt werden.
+	Siehe Konzept im Github…diese Attribute wären also Teil des segregierten BAIS-Modeldaten-Haushaltinterfaces (bzw. die getter-Methden für diese Attribute).
