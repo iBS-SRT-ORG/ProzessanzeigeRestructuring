@@ -1,0 +1,23 @@
+- diese Methode wird aufgelöst -> vergleiche dazu enrich_alv_data in cl_cd_alv_table_data bzw. create_alv_data.
+- alle hier vorgenommen Operationen werden zu Decorator-Klassen, die 'create_alv_data' erweitern -> für jede Operation ein Loop aufgemacht, der über
+  die Gesamtheit der ALV-Tabelleneinträge iteriert und diese je nach Produktanforderung erweitert. Hier in aktuell: BAIS- + DRT-Anforderungen.
+- das cust_alv_entry-Interface wird dabei segregiert -> in den Decorator-Klassen wird es dann entsprechend gecastet (Downcast) werden müssen.
+
+aktuell:
+
+METHOD /drt/if_cd_cust_alv_entry~dtrmn_yet_missing_column_info.
+
+    me->determine_cust_tab_info( model_data ).
+    me->det_parameter_service_info( model_data ).
+    me->collct_all_clss_names_in_entry( model_data ).
+
+    DATA tokenizer TYPE REF TO /drt/if_cd_tokenizer.
+    tokenizer = NEW /drt/cl_cd_tokenizer( ).
+    tokenizer->tokenize_given_classes( me->all_class_names_in_alv_entry ).
+    me->determine_logname(
+            model_data = model_data
+            tokenizer  = tokenizer ).
+    me->determine_customizing_ids( tokenizer ).
+    me->determine_rapis( tokenizer ).
+    me->determine_mapping_components( tokenizer ).
+  ENDMETHOD.
