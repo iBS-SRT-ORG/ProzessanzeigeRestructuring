@@ -1,0 +1,25 @@
+Methode muss flexibilisiert werden. Nicht alle Derivate haben Differnzierungsmerkmale (vgl. letzter Loop). IPE nicht einmal "Klasse ohne Differnzierung".
+Denkbar wäre eine Kombination aus Strategy + Decorator. Also dass gesamte Logik in Strategie-Objekt ausgelagert wird (mit üblichem Muster aus Strategie über Factory
+auslesen), diese allerdings je nach Anforderung dekoriert wird. 
+Also Basis-Strategie wäre die 1.IF-Bedingung, dann für DRT die 2. und für BAIS die 3. zusätzlich. 
+
+Übergabeparameter der Strategie-Methode: das ALV-Cust-Entry-Objekt. Model-Data müsste zu Klassenattribut (mit getter-Methode) gemacht werden, wird für Decorator-Klasse
+für BAIS benötigt (LOOP über Differnzierungsmerkmale). 
+
+aktuell: 
+
+ IF is_class_name( me->/drt/if_cd_cust_alv_entry~get_std_pp_group_class_name( ) ).
+   INSERT CONV char30( me->/drt/if_cd_cust_alv_entry~get_std_pp_group_class_name( ) ) INTO TABLE me->all_class_names_in_alv_entry.
+ ENDIF.
+ IF is_class_name( me->/drt/if_cd_cust_alv_entry~get_class_name_ohne_dffrnzrng( ) ).
+   INSERT CONV char30( me->/drt/if_cd_cust_alv_entry~get_class_name_ohne_dffrnzrng( ) ) INTO TABLE me->all_class_names_in_alv_entry.
+ ENDIF.
+ DATA(all_diff_criteria_values) = me->collect_all_dif_crteria_values( model_data ).
+ LOOP AT all_diff_criteria_values ASSIGNING FIELD-SYMBOL(<diff_criteria_value>).
+   IF is_class_name( <diff_criteria_value>-diff_criteria_value ).
+     INSERT CONV char30( <diff_criteria_value>-diff_criteria_value ) INTO TABLE me->all_class_names_in_alv_entry.
+   ENDIF.
+ ENDLOOP.
+ DELETE ADJACENT DUPLICATES FROM me->all_class_names_in_alv_entry.
+ 
+ 
