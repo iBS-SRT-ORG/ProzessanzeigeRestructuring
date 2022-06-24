@@ -1,0 +1,94 @@
+PAKET /DRT/CD_CONTOLLER
+	- Klasse /drt/cl_cd_clck_logname_nondrt gelöscht
+	- Klasse /drt/cl_cd_nondrt_ehndlr_fctry gelöscht (abstrakte Fabrik für BAIS-spezifische Eventhandling, gibt zB bei row_double_click_handler nud Spalte 'LOGNAME' /drt/cl_cd_clck_logname_nondrt zurürck.
+	- Klasse /drt/cl_cd_row_click_s_factory gelöscht (war gar nicht mehr nötig, durch abstrakte Fabrik)
+	- User-Commang-Factory gelöscht
+-------------------------------------------------------------------------------------------------------------------------------------
+PAKET /DRT/CD_MODEL
+CLASS /drt/cl_cd_model
+	- Methode split_differentiation_criteria entfernt
+	- Methode read_model_data_frm_img_tables bearbeitet
+		○ Die im Interface /drt/if_cd_model_data_accessor und der Klassenimplementierung /drt/cl_cd_model_data_accessor entfernten Methoden (siehe unten) wurden herausgenommen
+	
+INTERFACE /DRT/IF_CD_MODEL_DATA_ACCESSOR
+	- Folgende Methoden entfernt (alle BAIS-spezifisch):
+		○ read_differentiation_criteria
+		○ read_srt_documentation
+		○ read_target_config_frm_buffer
+		○ read_cash_components_assgnment
+CLASS /DRT/IF_CD_MODEL_DATA_ACCESSOR
+	- Die aus dem dazugehörigen Interface implementierten Methoden entfernt (alle BAIS-spezifisch)
+	- Interface-Segregation durchführen -> unterschiedliche Produktanforderungen berückscihtigen
+CLASS /DRT/IF_CD_ALV_SCHEME_BUILDER
+	- Folgende BAIS-spezifische private Methoden entfernt:
+		○ extend_alv_scheme_dynamically
+		○ assure_name_stays_unambigous
+		○ is_dfval_in_prod_diff_tab
+		○ is_field_already_exists_in_alv
+		○ is_field_name_matches_pattern
+		○ put_given_string_in_front
+CLASS /DRT/CL_CD_CUST_ALV_TABLE_DATA
+	- Folgende BAIS-spezifische private Methoden entfernt:
+		○ i_have_no_clue_what_this_does
+		○ fill_remaining_diff_criteria
+		○ create_int_and_ext_dif_tables
+		○ append_target_info
+		○ append_dupl_info
+	- Folgende BAIS-spezifische Methoen bearbeitet
+		○ Enrich_alv_data
+			§ Alles NACH dem ersten LOOP weg, also alles, was sich um Zieltabellen-Ermittlung gekümmert hat…ab dem Kommentar: "Erweiterung um Zieltabellen Info bei WRITER Eintrag"
+		○ transfer_pp_cus_disp_to_alv
+			§ Ganze BAIS-spezifische Logik für die Differnzierungsmerkmale und Cash-Komponenten rausgenommen, direkt nach der 1. IF-Bedingung, stattdessen wird einfach jeder IPE-Customizing-Eintrag als neue Zeile in das ALV inserted
+INTERFACE /DRT/IF_CD_PP_CUST_ENTRY
+	- Folgende Methoden wurden entfernt
+		○ get_cash_component
+		○ has_cash_component
+		○ is_cash_comp_exists_but_deact
+CLASS /DRT/CL_CD_PP_CUST_ENTRY
+	- Folgende private Datenelemente wurden entfernt
+		○ DATA cash_component TYPE /ibs/ebs_cash_comp.
+	- Folgende Interface-Implementierungen wurden entfernt
+		○ get_cash_component
+		○ has_cash_component
+		○ is_cash_comp_exists_but_deact
+	- Folgende Methoden wurden bearbeitet
+		○ Constructor
+			§ Alles nach dem Kommentar "BAIS-spezifische Logik" wurde entfernt
+CLASS UND IF /DRT/CL_CD_CC_CHECKER_CREATOR
+	- Komplett gelöscht
+CLASS /DRT/CL_CD_CUST_ALV_ENTRY
+	- Folgende BAIS-spezifische private Methoden entfernt:
+		○ determine_cust_tab_info
+		○ det_parameter_service_info
+		○ fill_cash_component
+		○ collect_all_dif_crteria_values wurde entfernt
+	- Folgende Methoden wurden bearbeitet
+		○ dtrmn_yet_missing_column_info
+			§ Determine_cust_tab_info-Aufruf entfernt
+			§ det_parameter_service_info-Aufruf entfernt
+		○ Collect_all_clss_names_in_entry
+			§ Der letzte LOOP über die Differnzierungsmerkmale wurde entfernt
+		○ determine_logname
+			§ Simple Factory-Aufruf (zur Unterscheidung zwischen BAIS und DRT) wurde entfernt und ersetzt durch direkte Instanziierung des BAIS-spezifischen Logname-Objekts
+	- Folgende Interface-Methoden wurden entfernt
+		○ /drt/if_cd_cust_alv_entry~fill_iterated_dif_crit_field
+CLASS /DRT/CL_CD_LOGNAME_S_FACTORY
+	Gelöscht
+	
+CLASS /DRT/CL_CD_LOGNAME_WTH_CSTMZNG
+	Gelöscht
+	
+INTERFACE /DRT/IF_CD_CUST_ALV_ENTRY
+	- Folgende Methoden wurden entfernt
+		○ fill_iterated_dif_crit_field
+		○ is_diff_cls_not_eq_to_std_cls
+CLASS /DRT/CL_CD_CC_CHECKER_CREATOR
+	Gelöscht
+------------------------------------------------------------------------------------------
+PAKET /DRT/CD_VIEW
+CLASS /DRT/CL_CD_FCAT_EXT_STRATEGY
+	- Folgende BAIS-spezifische private Methoden entfernt:
+		○ extend_fcat_dynamically (hier war die dynamische Auslese der Differnzierungsmerkmale für den Feldkatalog)
+	- Folgende BAIS-spezifische Interface-Methoden wurden bearbeitet
+		○ dynamically_extend_field_ct
+			§ Der Aufruf der gelöschten Methode 'extend_fcat_dynamically' wurde entfernt.
